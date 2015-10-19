@@ -3,7 +3,7 @@ enablePlugins(ScalaJSPlugin)
 organization := "com.payalabs"
 name := "scalajs-react-bridge"
 
-version := "0.3.0-SNAPSHOT"
+version := "0.3.0-CODEMETTLE"
 
 scalaVersion := "2.12.1"
 
@@ -87,3 +87,9 @@ pomExtra in Global := {
     </developer>
   </developers>
 }
+    
+	publishMavenStyle := true
+	    publishTo := Some("CodeMettle Maven" at ("http://maven.codemettle.com/repository/" + (if (isSnapshot.value) "snapshots" else "internal")))
+		    credentials += Credentials(Path.userHome / ".m2" / "credentials-snapshots")
+			    credentials += Credentials(Path.userHome / ".m2" / "credentials-internal")
+
