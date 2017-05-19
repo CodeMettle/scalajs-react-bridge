@@ -3,9 +3,11 @@ enablePlugins(ScalaJSPlugin)
 organization := "com.payalabs"
 name := "scalajs-react-bridge"
 
-version := "0.3.0-CODEMETTLE"
+version := "0.3.1-CODEMETTLE"
 
-scalaVersion := "2.12.1"
+crossScalaVersions := Seq("2.12.1", "2.11.7")
+
+scalaVersion := crossScalaVersions.value.head
 
 jsDependencies += RuntimeDOM
 
