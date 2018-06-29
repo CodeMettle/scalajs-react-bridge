@@ -58,28 +58,36 @@ object ReactBridgeComponent {
 
     val ctor = symbolOf[WithProps]
 
-    c.Expr(q"new $ctor(${c.prefix.tree}.jsComponent, ${propsObject(c)})")
+    val expr = q"new $ctor(${c.prefix.tree}.jsComponent, ${propsObject(c)})"
+    println("\n"+expr)
+    c.Expr(expr)
   }
 
   def autoNoChildrenImpl(c: Context): c.Expr[WithPropsNoChildren] = {
     import c.universe._
 
     val ctor = symbolOf[WithPropsNoChildren]
-    c.Expr(q"new $ctor(${c.prefix.tree}.jsComponent, ${propsObject(c)})")
+    val expr = q"new $ctor(${c.prefix.tree}.jsComponent, ${propsObject(c)})"
+    println("\n"+expr)
+    c.Expr(expr)
   }
 
   def autoNoTagModsImpl(c: Context): c.Expr[WithPropsAndTagsMods] = {
     import c.universe._
 
     val ctor = symbolOf[WithPropsAndTagsMods]
-    c.Expr(q"new $ctor(${c.prefix.tree}.jsComponent, ${propsObject(c)}, _root_.scala.List())")
+    val expr = q"new $ctor(${c.prefix.tree}.jsComponent, ${propsObject(c)}, _root_.scala.List())"
+    println("\n"+expr)
+    c.Expr(expr)
   }
 
   def autoNoTagModsNoChildrenImpl(c: Context): c.Expr[VdomElement] = {
     import c.universe._
 
     val ctor = symbolOf[WithPropsAndTagModsAndChildren]
-    c.Expr(q"new $ctor(${c.prefix.tree}.jsComponent, ${propsObject(c)}, _root_.scala.List()).apply")
+    val expr = q"new $ctor(${c.prefix.tree}.jsComponent, ${propsObject(c)}, _root_.scala.List()).apply"
+    println("\n"+expr)
+    c.Expr(expr)
   }
 
   private def propsObject(c: Context): c.Expr[js.Object] = {

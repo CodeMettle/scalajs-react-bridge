@@ -1,15 +1,15 @@
 package com.payalabs.scalajs.react
 
+import japgolly.scalajs.react.component.Js
+import japgolly.scalajs.react.vdom.{TagMod, VdomElement, VdomNode}
+import japgolly.scalajs.react.{CallbackTo, Children, CtorType}
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.experimental.macros
 import scala.reflect.ClassTag
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.{JSRichFutureNonThenable, JSRichOption}
 import scala.scalajs.js.{Object, |}
-
-import japgolly.scalajs.react.component.Js
-import japgolly.scalajs.react.vdom.{TagMod, VdomElement, VdomNode}
-import japgolly.scalajs.react.{CallbackTo, Children, CtorType}
 
 
 package object bridge extends GeneratedImplicits {
@@ -26,6 +26,8 @@ package object bridge extends GeneratedImplicits {
 
   implicit def floatWriter: JsWriter[Float] = writerFromConversion[Float]
   implicit def doubleWriter: JsWriter[Double] = writerFromConversion[Double]
+  implicit def numberWriter: JsWriter[Number] =
+    writerFromConversion(implicitly[Double => js.Any].compose[Number](_.doubleValue))
 
   implicit def unitWriter: JsWriter[Unit] = writerFromConversion[Unit]
   implicit def jsAnyWriter[A <: js.Any]: JsWriter[A] = JsWriter(identity)
@@ -47,6 +49,12 @@ package object bridge extends GeneratedImplicits {
 
   implicit def enumerationWriter[T <: Enumeration#Value]: JsWriter[T] =
     JsWriter(_.toString)
+
+  implicit def arrayWriter[T : JsWriter]: JsWriter[scala.Array[T]] = {
+    val elementWriter = implicitly[JsWriter[T]]
+
+    JsWriter((value: scala.Array[T]) => js.Array(value.map(e => elementWriter.toJs(e)): _*))
+  }
 
   implicit def seqWriter[T: JsWriter]: JsWriter[Seq[T]] = {
     val elementWriter = implicitly[JsWriter[T]]
@@ -75,6 +83,28 @@ package object bridge extends GeneratedImplicits {
     JsWriter(_.map(writeA.toJs).toJSPromise)
 
   implicit def vdomElementWriter: JsWriter[VdomElement] = JsWriter(_.rawElement)
+
+  /*
+  implicit def reactNodeWriter: JsWriter[React.Node] = {
+    lazy val arrayWriter: JsWriter[js.Array[_]] = JsWriter((a: js.Array[_]) => a.map(e => writer.toJs(e)))
+
+    lazy val writer = JsWriter[Any]({
+      case null => nullWriter.toJs(null)
+      case () => unitWriter.toJs(())
+      case b: Boolean => boolWriter.toJs(b)
+      case b: Byte => byteWriter.toJs(b)
+      case s: Short => shortWriter.toJs(s)
+      case i: Int => intWriter.toJs(i)
+      case f: Float => floatWriter.toJs(f)
+      case d: Double => doubleWriter.toJs(d)
+      case a: js.Array[_] => arrayWriter.toJs(a)
+      case e: js.Object => e
+    })
+
+    writer.asInstanceOf[JsWriter[React.Node]]
+  }*/
+
+  implicit def vdomNodeWriter: JsWriter[VdomNode] = JsWriter[VdomNode](n => n.rawNode.asInstanceOf[js.Any])
 
   type JsComponentType = Js.ComponentSimple[Object, CtorType.Summoner.Aux[Object, Children.Varargs, CtorType.PropsAndChildren]#CT, Js.UnmountedWithRawType[Object, Null, Js.RawMounted[Object, Null]]]
 
